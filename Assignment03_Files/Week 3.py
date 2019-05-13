@@ -28,7 +28,6 @@ def getRasterExtent(list_of_files, data_path):
     xmaxs = []
     ymaxs = []
     projections = []
-
     for f in list_of_files:
         if re.match(".*\\.[tT][iI][fF]{1,2}$", f):
             raster = gdal.Open(data_path + f)
@@ -41,25 +40,19 @@ def getRasterExtent(list_of_files, data_path):
             ymaxs.append(f_ymax)
             ymins.append(f_ymax + (f_pheight * rows))
             del raster
-    for counter in range(0, 4):
+    for counter in range(0, len(projections)-1):
         print(counter)
         if projections[counter] == projections[counter + 1]:
             print('projections match')
         else:
             print('Projections dont match')
-    box_1 = box(xmins[0], ymins[0], xmaxs[0], ymaxs[0])
-    box_2 = box(xmins[1], ymins[1], xmaxs[1], ymaxs[1])
-    box_3 = box(xmins[2], ymins[2], xmaxs[2], ymaxs[2])
-    box_4 = box(xmins[3], ymins[3], xmaxs[3], ymaxs[3])
-    box_5 = box(xmins[4], ymins[4], xmaxs[4], ymaxs[4])
-    intersecto = box_1.intersection(box_2)
-    intersecto = intersecto.intersection(box_3)
-    intersecto = intersecto.intersection(box_4)
-    intersecto = intersecto.intersection(box_5)
-    UL = list(intersecto.exterior.coords)[0]
-    LR = list(intersecto.exterior.coords)[2]
+    x_min = max(xmins)
+    y_min = max(ymins)
+    x_max = min(xmaxs)
+    y_max = min(ymaxs)
+    UL = [x_min, y_max]
+    LR = [x_max, y_min]
     return [UL, LR]
-
 # ####################################### PROCESSING ########################################################## #
 boxes = getRasterExtent(files, data_path=datapath)
 #print(boxes)
@@ -105,7 +98,7 @@ for i in image_statistics['image']:
     year.append(years)
 image_statistics['year'] = pd.Series(year, index = image_statistics.index)
 
-
+print(image_statistics)
 
 st_00_10 = list_of_arrays[0]-list_of_arrays[2]
 print(st_00_10.mean())
